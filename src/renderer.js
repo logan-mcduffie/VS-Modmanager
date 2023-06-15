@@ -1,4 +1,18 @@
 const { BrowserWindow } = require('@electron/remote')
+const myModpacksButton = document.getElementById('my-modpacks-button');
+const browseModpacksButton = document.getElementById('browse-modpacks-button');
+
+myModpacksButton.classList.add('active');
+
+myModpacksButton.addEventListener('click', function() {
+    myModpacksButton.classList.add('active');
+    browseModpacksButton.classList.remove('active');
+  });
+  
+browseModpacksButton.addEventListener('click', function() {
+    browseModpacksButton.classList.add('active');
+    myModpacksButton.classList.remove('active');
+  });
 
 document.getElementById('minimize').addEventListener('click', () => {
     console.log('Minimize button clicked')

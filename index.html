@@ -7,12 +7,15 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'"
     />
-    <title>Hello from Electron renderer!</title>
+    <title>Mod Manager</title>
     <link rel="stylesheet" href="src/styles.css">
   </head>
   <body>
     <div id="title-bar">
-      <div class="left-content">
+      <div class="logo-container">
+        <img src="assets/rough.png" alt="Logo" />
+      </div>
+      <div class="left-taskbar-content">
         <!-- Other content here -->
       </div>
       <div id="window-controls">
@@ -21,8 +24,18 @@
         <button id="close">x</button>
       </div>
     </div>
-    <h1>Hello from Electron renderer!</h1>
-    <p>👋</p>
+    <div id="button-container">
+      <div class="left-content">
+        <button id="my-modpacks-button">My Modpacks</button>
+        <button id="browse-modpacks-button">Browse Modpacks</button>
+      </div>
+      <div class="right-content">
+        <button id="create-modpack-button">+ Create Modpack</button>
+      </div>
+    </div>
+    <div id="modpacks-container">
+      <!-- Modpacks will be dynamically added here -->
+    </div>
     <script src="src/renderer.js"></script>
   </body>
 </html>
