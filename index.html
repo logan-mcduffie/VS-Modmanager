@@ -3,10 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
-    />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' blob:; script-src 'self'">
+
     <title>Mod Manager</title>
     <link rel="stylesheet" href="src/styles.css">
   </head>
@@ -33,8 +31,11 @@
         <button id="create-modpack-button">+ Create Modpack</button>
       </div>
     </div>
-    <div id="modpacks-container">
+    <div id="my-modpacks">
       <!-- Modpacks will be dynamically added here -->
+    </div>
+    <div id="browse-modpacks">
+
     </div>
     <div id="myModal" class="modal">
 
@@ -46,7 +47,8 @@
           <input type="text" id="modpackName" name="modpackName"><br>
           <label for="modpackLogo">Modpack Logo:</label><br>
           <button type="button" id="modpackLogoButton">Choose File</button>
-          <input type="file" id="modpackLogo" name="modpackLogo" accept="image/png, image/jpeg" style="display: none;"><br>
+          <input type="file" id="modpackLogo" name="modpackLogo" accept="image/png, image/jpeg">
+          <br>
           <input type="submit" value="Create Modpack">
         </form>
       </div>

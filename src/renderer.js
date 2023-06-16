@@ -6,6 +6,8 @@ myModpacksButton.classList.add('active');
 
 myModpacksButton.addEventListener('click', function() {
     if (!myModpacksButton.classList.contains('active')) {
+      document.getElementById('my-modpacks').style.display = 'block';
+      document.getElementById('browse-modpacks').style.display = 'none';
       myModpacksButton.classList.add('active');
       browseModpacksButton.classList.remove('active');
     }
@@ -13,6 +15,8 @@ myModpacksButton.addEventListener('click', function() {
   
   browseModpacksButton.addEventListener('click', function() {
     if (!browseModpacksButton.classList.contains('active')) {
+      document.getElementById('my-modpacks').style.display = 'none';
+      document.getElementById('browse-modpacks').style.display = 'block';
       browseModpacksButton.classList.add('active');
       myModpacksButton.classList.remove('active');
     }
@@ -96,3 +100,28 @@ fileInput.onchange = function() {
     button.textContent = 'Choose File';
   }
 }
+
+document.getElementById('modpackForm').addEventListener('submit', function(event) {
+  // Prevent the form from submitting normally
+  event.preventDefault();
+
+  // Get the modpack name and logo from the form
+  var modpackName = document.getElementById('modpackName').value;
+  var modpackLogo = document.getElementById('modpackLogo').files[0];
+
+  // Create a new tile for the modpack
+  var modpackTile = document.createElement('div');
+  modpackTile.className = 'modpack-tile';
+
+  // Add the modpack name and logo to the tile
+  var nameElement = document.createElement('h2');
+  nameElement.textContent = modpackName;
+  modpackTile.appendChild(nameElement);
+
+  var logoElement = document.createElement('img');
+  logoElement.src = URL.createObjectURL(modpackLogo);
+  modpackTile.appendChild(logoElement);
+
+  // Add the tile to the modpacks container
+  document.getElementById('my-modpacks').appendChild(modpackTile);
+});
