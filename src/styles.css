@@ -129,3 +129,89 @@
   right: 16px;
   bottom: 6px;
 }
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #252525; /* Match the title bar color */
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 40%; /* Could be more or less, depending on screen size */
+  color: #f0f0f0; /* Match the title bar text color */
+}
+
+/* The Close Button */
+.close {
+  color: #f0f0f0; /* Match the title bar text color */
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  margin: -18px -10px 0 0; /* Position closer to the top right */
+}
+
+.close:hover,
+.close:focus {
+  color: #fafafa; /* Bright off-white */
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Form Styles */
+#modpackForm {
+  display: flex;
+  flex-direction: column;
+}
+
+#modpackForm button {
+  padding: 10px;
+  border: none;
+  background-color: #444;
+  color: #f0f0f0; /* Match the title bar text color */
+  cursor: pointer;
+}
+
+#modpackForm button:hover {
+  background-color: #666;
+}
+
+::file-selector-button {
+  display: none;
+}
+
+#modpackForm label {
+  margin-bottom: 5px; /* Move closer to the input fields */
+  color: #f0f0f0; /* Match the title bar text color */
+}
+
+#modpackForm input[type="text"] {
+  pointer-events: auto; /* Ensure the text input is editable */
+}
+
+#modpackForm input[type="file"] {
+  pointer-events: none; /* Disable clicking on the input field */
+}
+
+#modpackForm input[type="submit"] {
+  padding: 10px;
+  border: none;
+  background-color: #666;
+  color: #f0f0f0; /* Match the title bar text color */
+  cursor: pointer;
+}
+
+#modpackForm input[type="submit"]:hover {
+  background-color: #888;
+}
