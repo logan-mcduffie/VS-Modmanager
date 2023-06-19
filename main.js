@@ -6,9 +6,10 @@ const appDataPath = process.env.APPDATA || (process.platform === 'darwin' ? proc
 const modpalFolderPath = path.join(appDataPath, 'Modpal');
 const modpacksDirectoryPath = path.join(modpalFolderPath, 'modpacks');
 require('@electron/remote/main').initialize()
+let win;
 
 const createWindow = () => {
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     backgroundColor: '#2e2c29',
     width: 1120,
     height: 780,
@@ -25,43 +26,6 @@ const createWindow = () => {
   fs.mkdir(modpalFolderPath, { recursive: true }, (err) => {
     if (err) throw err;
   });
-
-  fs.readdir(modpacksDirectoryPath, (error, modpackDirectories) => {
-    if (error) {
-      console.error('An error occurred:', error);
-      return;
-    }
-  
-    // For each modpack directory...
-    modpackDirectories.forEach((modpackDirectory) => {
-      // Define the path to the manifest file
-      const manifestFilePath = path.join(modpacksDirectoryPath, modpackDirectory, 'manifest.json');
-  
-      // Read the manifest file
-      fs.readFile(manifestFilePath, 'utf8', (error, manifestFile) => {
-        if (error) {
-          console.error('An error occurred:', error);
-          return;
-        }
-  
-        // Parse the manifest file
-        const manifestData = JSON.parse(manifestFile);
-
-         // Define the path to the logo file
-        const logoFilePath = path.join(modpacksDirectoryPath, modpackDirectory, 'logo.png');
-
-        // Read the logo file into a Buffer
-        fs.readFile(logoFilePath, (error, logoData) => {
-          if (error) {
-            console.error('An error occurred:', error);
-            return;
-          }
-
-          win.webContents.send('load-modpacks', manifestData, logoData);
-      });
-    });
-  });
-});
 
   win.loadFile('index.html')
 
@@ -89,7 +53,7 @@ ipcMain.on('create-modpack', (event, modpackName, logoData) => {
         return;
       }
 
-      event.reply('create-modpack-reply', 'Modpack created successfully!');
+      event.reply('create-modpack-reply', 'Modpack created successfully!', manifestData, logoData);
     });
   });
 
@@ -116,6 +80,40 @@ ipcMain.on('create-modpack', (event, modpackName, logoData) => {
     }
   console.log('Manifest file created successfully!');
   });
+});
+
+function loadModpacks() {
+  fs.readdir(modpacksDirectoryPath, (error, modpackDirectories) => {
+    if (error) {
+      console.error('An error occurred:', error);
+      return;
+    }
+    
+    modpackDirectories.forEach((modpackDirectory) => {
+      const manifestFilePath = path.join(modpacksDirectoryPath, modpackDirectory, 'manifest.json');
+      fs.readFile(manifestFilePath, 'utf8', (error, manifestFile) => {
+        if (error) {
+          console.error('An error occurred:', error);
+          return;
+        }
+        
+        const manifestData = JSON.parse(manifestFile);
+        const logoFilePath = path.join(modpacksDirectoryPath, modpackDirectory, 'logo.png');
+        fs.readFile(logoFilePath, (error, logoData) => {
+          if (error) {
+            console.error('An error occurred:', error);
+            return;
+          }
+          
+          win.webContents.send('load-modpacks', manifestData, logoData);
+        });
+      });
+    });
+  });
+}
+
+ipcMain.on('load-modpacks', (event) => {
+  loadModpacks();
 });
 
 app.whenReady().then(() => {

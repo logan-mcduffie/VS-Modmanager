@@ -59,12 +59,16 @@ function closeModalAndResetForm() {
 
 function handleFormSubmission(event) {
     event.preventDefault();
+    ipcRenderer.on('create-modpack-reply', (event, message, modpackData, logoData) => {
+        console.log(message);
+        createModpackTile(modpackData, logoData);
+      });
     createModpackDirectory();
     createModpackTile();
     closeModalAndResetForm();
 }
 
-function createModpackTile(modpackData, logoData) {
+function createModpackTile(manifestData, logoData) {
     var modpackTile = document.createElement('div');
     modpackTile.className = 'modpack-tile';
   
@@ -73,11 +77,11 @@ function createModpackTile(modpackData, logoData) {
     modpackTile.appendChild(logoElement);
   
     var nameElement = document.createElement('h2');
-    nameElement.textContent = modpackData.modpackName;
+    nameElement.textContent = manifestData.modpackName;
     modpackTile.appendChild(nameElement);
   
     var authorElement = document.createElement('p');
-    authorElement.textContent = "Author: " + modpackData.author;
+    authorElement.textContent = "Author: " + manifestData.author;
     modpackTile.appendChild(authorElement);
   
     document.getElementById('my-modpacks').appendChild(modpackTile);
@@ -107,3 +111,5 @@ function createModpackDirectory() {
 ipcRenderer.on('load-modpacks', (event, modpackData, logoData) => {
     createModpackTile(modpackData, logoData);
   });
+
+ipcRenderer.send('load-modpacks');
