@@ -1,31 +1,15 @@
 // Import required modules
 const { BrowserWindow } = require('@electron/remote');
+const { ipcRenderer } = require('electron');
+const fs = require('fs');
 
 // Define UI elements
-const { ipcRenderer } = require('electron');
 const modal = document.getElementById("myModal");
 const createModpackButton = document.getElementById("create-modpack-button");
 const closeButton = document.getElementsByClassName("close")[0];
 const form = document.getElementById('modpackForm');
 const modpackLogoButton = document.getElementById('modpackLogoButton');
 const modpackLogoInput = document.getElementById('modpackLogo');
-const fs = require('fs');
-const pages = ['my-modpacks', 'browse-modpacks'];
-const buttons = {
-    'my-modpacks': myModpacksButton,
-    'browse-modpacks': browseModpacksButton,
-};
-const pageElements = {};
-for (const page of pages) {
-    pageElements[page] = document.getElementById(page);
-}
-
-// Add 'active' class to 'myModpacksButton' by default
-myModpacksButton.classList.add('active');
-
-// Event listeners for switching views
-myModpacksButton.addEventListener('click', () => goToPage('my-modpacks'));
-browseModpacksButton.addEventListener('click', () => goToPage('browse-modpacks'));
 
 // Event listeners for window controls
 document.getElementById('minimize').addEventListener('click', () => BrowserWindow.getFocusedWindow().minimize());
@@ -44,24 +28,52 @@ modpackLogoInput.onchange = () => modpackLogoButton.textContent = modpackLogoInp
 // Event listener for form submission
 form.addEventListener('submit', handleFormSubmission);
 
-// Function to change the current page
-function goToPage(pageName) {
-    const pageElement = pageElements[pageName];
-    if (!pageElement) {
-        console.error(`Page "${pageName}" not found`);
-        return;
-    }
+window.onload = function() {
+    // Define your pages
+    const pages = ['my-modpacks', 'browse-modpacks']; // Add more page IDs as needed...
 
-    // Hide all pages and remove 'active' class from all buttons
+    // Store your page elements in an object
+    const pageElements = {};
     for (const page of pages) {
-        pageElements[page].style.display = 'none';
-        buttons[page].classList.remove('active');
+        pageElements[page] = document.getElementById(page);
     }
 
-    // Show the current page
-    pageElement.style.display = 'grid';
-    button.classList.add('active');
-}
+    // Store your buttons in an object
+    const buttons = {
+        'my-modpacks': document.getElementById('my-modpacks-button'),
+        'browse-modpacks': document.getElementById('browse-modpacks-button'),
+        // Add more buttons as needed...
+    };
+
+    // Function to change the current page
+    function goToPage(pageName) {
+        const pageElement = pageElements[pageName];
+        const button = buttons[pageName];
+        if (!pageElement || !button) {
+            console.error(`Page or button "${pageName}" not found`);
+            return;
+        }
+
+        // Hide all pages and remove 'active' class from all buttons
+        for (const page of pages) {
+            pageElements[page].style.display = 'none';
+            buttons[page].classList.remove('active');
+        }
+
+        // Show the current page and add 'active' class to the current button
+        pageElement.style.display = 'grid';
+        button.classList.add('active');
+    }
+
+    // Event listeners for switching views
+    buttons['my-modpacks'].addEventListener('click', () => goToPage('my-modpacks'));
+    buttons['browse-modpacks'].addEventListener('click', () => goToPage('browse-modpacks'));
+
+    // Initialize the default page
+    goToPage('my-modpacks');
+
+    // Rest of your code...
+};
 
 function toggleMaximize() {
     let window = BrowserWindow.getFocusedWindow();
