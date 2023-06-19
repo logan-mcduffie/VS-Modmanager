@@ -2,6 +2,7 @@
 const { BrowserWindow } = require('@electron/remote');
 const { ipcRenderer } = require('electron');
 const fs = require('fs');
+const path = require('path');
 
 // Define UI elements
 const modal = document.getElementById("myModal");
@@ -10,6 +11,9 @@ const closeButton = document.getElementsByClassName("close")[0];
 const form = document.getElementById('modpackForm');
 const modpackLogoButton = document.getElementById('modpackLogoButton');
 const modpackLogoInput = document.getElementById('modpackLogo');
+const appDataPath = process.env.APPDATA || (process.platform === 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
+const modpalFolderPath = path.join(appDataPath, 'Modpal');
+const modpacksDirectoryPath = path.join(modpalFolderPath, 'modpacks');
 
 // Event listeners for window controls
 document.getElementById('minimize').addEventListener('click', () => BrowserWindow.getFocusedWindow().minimize());
@@ -74,6 +78,48 @@ window.onload = function() {
 
     // Rest of your code...
 };
+
+// Watch the modpack directory for changes
+fs.watch(modpacksDirectoryPath, (eventType, filename) => {
+    // If a file was added or changed
+    if (eventType === 'change' || eventType === 'rename') {
+        const filePath = path.join(modpacksDirectoryPath, filename);
+
+        // If a modpack was deleted
+        if (!fs.existsSync(filePath)) {
+            // Remove the modpack from the modpack list
+            removeModpack(filename);
+        } else {
+            // If the manifest was updated
+            if (filename === 'manifest.json') {
+                // Update the associated text
+                updateModpack(filename);
+            }
+        }
+    }
+});
+
+function removeModpack(modpackName) {
+    // Remove the modpack from the modpack list in "My Modpacks"
+    // You'll need to implement this function based on how you're storing and displaying your modpacks
+}
+
+function updateModpack(modpackName) {
+    // Read the updated manifest
+    const manifestPath = path.join(modpackDirectory, modpackName, 'manifest.json');
+    fs.readFile(manifestPath, 'utf8', (err, data) => {
+        if (err) {
+            console.error(`Failed to read manifest for modpack "${modpackName}":`, err);
+            return;
+        }
+
+        // Parse the manifest data
+        const manifestData = JSON.parse(data);
+
+        // Update the associated text (like modpack name and author)
+        // You'll need to implement this function based on how you're storing and displaying your modpacks
+    });
+}
 
 function toggleMaximize() {
     let window = BrowserWindow.getFocusedWindow();
