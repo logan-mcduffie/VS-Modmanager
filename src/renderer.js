@@ -33,6 +33,9 @@ modpackLogoInput.onchange = () => modpackLogoButton.textContent = modpackLogoInp
 // Event listener for form submission
 form.addEventListener('submit', handleFormSubmission);
 
+// Event listener for modpack tile press
+modpackTile.addEventListener('click', () => displayModpackPage(manifestData));
+
 window.onload = function() {
 
     const watcher = chokidar.watch(modpacksDirectoryPath, {
@@ -204,6 +207,36 @@ function createModpackDirectory() {
     ipcRenderer.on('create-modpack-reply', (event, message) => {
         console.log(message);
       });
+}
+
+function createModpackPage(modpack) {
+    return `
+        <div id="modpack-page">
+            <h1>${modpack.modpackName}</h1>
+            <p>Author: ${modpack.author}</p>
+            <p>Version: ${modpack.version}</p>
+            <p>Description: ${modpack.description}</p>
+            <p>Creation Date: ${modpack.creationDate}</p>
+            <h2>Mod List:</h2>
+            <ul>
+                ${modpack.modList.map(mod => `<li>${mod}</li>`).join('')}
+            </ul>
+            <button id="back-button">&lt; Back</button>
+        </div>
+    `
+}
+
+function displayModpackPage(modpack) {
+    const modpackPageHTML = createModpackPage(modpack);
+    document.body.innerHTML = modpackPageHTML;
+    setTimeout(() => {
+        // Add an event listener to the "Back" button
+        document.getElementById('back-button').addEventListener('click', displayMyModpacksPage);
+    }, 0);
+}
+
+function displayMyModpacksPage() {
+    document.body.innerHTML = myModpacksPageHTML;
 }
 
 ipcRenderer.on('load-modpacks', (event, modpackData, logoData) => {
