@@ -57,10 +57,11 @@ const createWindow = () => {
             return;
           }
 
-          mainWindow.webContents.send('load-modpacks', manifestData, logoData);
+          win.webContents.send('load-modpacks', manifestData, logoData);
       });
     });
   });
+});
 
   win.loadFile('index.html')
 

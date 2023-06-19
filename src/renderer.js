@@ -64,27 +64,25 @@ function handleFormSubmission(event) {
     closeModalAndResetForm();
 }
 
-function createModpackTile() {
-    var modpackName = document.getElementById('modpackName').value;
-    var modpackLogo = document.getElementById('modpackLogo').files[0];
-
+function createModpackTile(modpackData, logoData) {
     var modpackTile = document.createElement('div');
     modpackTile.className = 'modpack-tile';
-
+  
     var logoElement = document.createElement('img');
-    logoElement.src = URL.createObjectURL(modpackLogo);
+    logoElement.src = URL.createObjectURL(new Blob([logoData]));
     modpackTile.appendChild(logoElement);
-
+  
     var nameElement = document.createElement('h2');
-    nameElement.textContent = modpackName;
+    nameElement.textContent = modpackData.modpackName;
     modpackTile.appendChild(nameElement);
-
+  
     var authorElement = document.createElement('p');
-    authorElement.textContent = "Author:"
+    authorElement.textContent = "Author: " + modpackData.author;
     modpackTile.appendChild(authorElement);
-
+  
     document.getElementById('my-modpacks').appendChild(modpackTile);
-}
+  }
+  
 
 function createModpackDirectory() {
     var modpackName = document.getElementById('modpackName').value;
@@ -105,3 +103,7 @@ function createModpackDirectory() {
         console.log(message);
       });
 }
+
+ipcRenderer.on('load-modpacks', (event, modpackData, logoData) => {
+    createModpackTile(modpackData, logoData);
+  });
