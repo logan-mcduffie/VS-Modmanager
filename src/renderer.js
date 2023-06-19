@@ -102,6 +102,39 @@ watcher
     }
   });
 
+function removeModpack(modpackName) {
+    // Get the modpack tile element
+    const modpackTile = document.getElementById(modpackName);
+    if (modpackTile) {
+        // Remove the modpack tile from the modpack list in "My Modpacks"
+        modpackTile.remove();
+    }
+}
+
+function updateModpack(modpackName) {
+    // Read the updated manifest
+    const manifestPath = path.join(modpacksDirectoryPath, modpackName, 'manifest.json');
+    fs.readFile(manifestPath, 'utf8', (err, data) => {
+        if (err) {
+            console.error(`Failed to read manifest for modpack "${modpackName}":`, err);
+            return;
+        }
+
+        // Parse the manifest data
+        const manifestData = JSON.parse(data);
+
+        // Get the modpack tile element
+        const modpackTile = document.getElementById(modpackName);
+        if (modpackTile) {
+            // Update the associated text (like modpack name and author)
+            const nameElement = modpackTile.querySelector('h2');
+            const authorElement = modpackTile.querySelector('p');
+            nameElement.textContent = manifestData.modpackName;
+            authorElement.textContent = "Author: " + manifestData.author;
+        }
+    });
+}
+
 function toggleMaximize() {
     let window = BrowserWindow.getFocusedWindow();
     window.isMaximized() ? window.unmaximize() : window.maximize();
