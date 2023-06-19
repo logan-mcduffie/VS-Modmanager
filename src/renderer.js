@@ -3,8 +3,6 @@ const { BrowserWindow } = require('@electron/remote');
 
 // Define UI elements
 const { ipcRenderer } = require('electron');
-const myModpacksButton = document.getElementById('my-modpacks-button');
-const browseModpacksButton = document.getElementById('browse-modpacks-button');
 const modal = document.getElementById("myModal");
 const createModpackButton = document.getElementById("create-modpack-button");
 const closeButton = document.getElementsByClassName("close")[0];
@@ -12,13 +10,22 @@ const form = document.getElementById('modpackForm');
 const modpackLogoButton = document.getElementById('modpackLogoButton');
 const modpackLogoInput = document.getElementById('modpackLogo');
 const fs = require('fs');
+const pages = ['my-modpacks', 'browse-modpacks'];
+const buttons = {
+    'my-modpacks': myModpacksButton,
+    'browse-modpacks': browseModpacksButton,
+};
+const pageElements = {};
+for (const page of pages) {
+    pageElements[page] = document.getElementById(page);
+}
 
 // Add 'active' class to 'myModpacksButton' by default
 myModpacksButton.classList.add('active');
 
 // Event listeners for switching views
-myModpacksButton.addEventListener('click', () => switchView(myModpacksButton, browseModpacksButton, 'my-modpacks', 'browse-modpacks'));
-browseModpacksButton.addEventListener('click', () => switchView(browseModpacksButton, myModpacksButton, 'browse-modpacks', 'my-modpacks'));
+myModpacksButton.addEventListener('click', () => goToPage('my-modpacks'));
+browseModpacksButton.addEventListener('click', () => goToPage('browse-modpacks'));
 
 // Event listeners for window controls
 document.getElementById('minimize').addEventListener('click', () => BrowserWindow.getFocusedWindow().minimize());
@@ -37,13 +44,23 @@ modpackLogoInput.onchange = () => modpackLogoButton.textContent = modpackLogoInp
 // Event listener for form submission
 form.addEventListener('submit', handleFormSubmission);
 
-function switchView(activeButton, inactiveButton, activeView, inactiveView) {
-    if (!activeButton.classList.contains('active')) {
-        document.getElementById(activeView).style.display = 'grid';
-        document.getElementById(inactiveView).style.display = 'none';
-        activeButton.classList.add('active');
-        inactiveButton.classList.remove('active');
+// Function to change the current page
+function goToPage(pageName) {
+    const pageElement = pageElements[pageName];
+    if (!pageElement) {
+        console.error(`Page "${pageName}" not found`);
+        return;
     }
+
+    // Hide all pages and remove 'active' class from all buttons
+    for (const page of pages) {
+        pageElements[page].style.display = 'none';
+        buttons[page].classList.remove('active');
+    }
+
+    // Show the current page
+    pageElement.style.display = 'grid';
+    button.classList.add('active');
 }
 
 function toggleMaximize() {
