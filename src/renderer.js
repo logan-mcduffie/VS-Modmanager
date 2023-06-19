@@ -64,7 +64,6 @@ function handleFormSubmission(event) {
         createModpackTile(modpackData, logoData);
       });
     createModpackDirectory();
-    createModpackTile();
     closeModalAndResetForm();
 }
 
