@@ -53,32 +53,31 @@ ipcMain.on('create-modpack', (event, modpackName, logoData) => {
         return;
       }
 
-      event.reply('create-modpack-reply', 'Modpack created successfully!', manifestData, logoData);
+      // Define the manifest data
+      const manifestData = {
+        modpackName: modpackName,
+        author: 'Author Name',
+        version: '1.0.0',
+        modList: [
+          // Add your mods here
+        ],
+        description: 'A brief description of the modpack.',
+        creationDate: new Date().toLocaleDateString() // Get the current date in YYYY-MM-DD format
+      };
+
+      // Define the path for the manifest file
+      const manifestFilePath = path.join(modpackDirectoryPath, 'manifest.json');
+
+      // Write the manifest file
+      fs.writeFile(manifestFilePath, JSON.stringify(manifestData, null, 2), (error) => {
+        if (error) {
+          console.error('An error occurred:', error);
+          return;
+        }
+        console.log('Manifest file created successfully!');
+        event.reply('create-modpack-reply', 'Modpack created successfully!', manifestData, logoData);
+      });
     });
-  });
-
-  // Define the manifest data
-  const manifestData = {
-    modpackName: modpackName,
-    author: 'Author Name',
-    version: '1.0.0',
-    modList: [
-      // Add your mods here
-    ],
-    description: 'A brief description of the modpack.',
-    creationDate: new Date().toLocaleDateString() // Get the current date in YYYY-MM-DD format
-  };
-
-  // Define the path for the manifest file
-  const manifestFilePath = path.join(modpackDirectoryPath, 'manifest.json');
-
-  // Write the manifest file
-  fs.writeFile(manifestFilePath, JSON.stringify(manifestData, null, 2), (error) => {
-    if (error) {
-      console.error('An error occurred:', error);
-      return;
-    }
-  console.log('Manifest file created successfully!');
   });
 });
 

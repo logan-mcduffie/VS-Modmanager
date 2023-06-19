@@ -3,6 +3,7 @@ const { BrowserWindow } = require('@electron/remote');
 const { ipcRenderer } = require('electron');
 const fs = require('fs');
 const path = require('path');
+const chokidar = require('chokidar');
 
 // Define UI elements
 const modal = document.getElementById("myModal");
@@ -14,6 +15,12 @@ const modpackLogoInput = document.getElementById('modpackLogo');
 const appDataPath = process.env.APPDATA || (process.platform === 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
 const modpalFolderPath = path.join(appDataPath, 'Modpal');
 const modpacksDirectoryPath = path.join(modpalFolderPath, 'modpacks');
+const watcher = chokidar.watch(modpacksDirectoryPath, {
+    ignored: /(^|[\/\\])\../, // ignore dotfiles
+    persistent: true
+  });
+
+let currentModpacks = new Set(); // Keep track of the current modpacks
 
 // Event listeners for window controls
 document.getElementById('minimize').addEventListener('click', () => BrowserWindow.getFocusedWindow().minimize());
@@ -79,47 +86,21 @@ window.onload = function() {
     // Rest of your code...
 };
 
-// Watch the modpack directory for changes
-fs.watch(modpacksDirectoryPath, (eventType, filename) => {
-    // If a file was added or changed
-    if (eventType === 'change' || eventType === 'rename') {
-        const filePath = path.join(modpacksDirectoryPath, filename);
-
-        // If a modpack was deleted
-        if (!fs.existsSync(filePath)) {
-            // Remove the modpack from the modpack list
-            removeModpack(filename);
-        } else {
-            // If the manifest was updated
-            if (filename === 'manifest.json') {
-                // Update the associated text
-                updateModpack(filename);
-            }
-        }
+// Add event listeners
+watcher
+  .on('addDir', path => console.log(`Directory ${path} has been added`))
+  .on('unlinkDir', path => {
+    console.log(`Directory ${path} has been removed`);
+    const modpackName = path.split(path.sep).pop();
+    removeModpack(modpackName);
+  })
+  .on('change', path => {
+    console.log(`File ${path} has been changed`);
+    if (path.endsWith('manifest.json')) {
+      const modpackName = path.split(path.sep).pop();
+      updateModpack(modpackName);
     }
-});
-
-function removeModpack(modpackName) {
-    // Remove the modpack from the modpack list in "My Modpacks"
-    // You'll need to implement this function based on how you're storing and displaying your modpacks
-}
-
-function updateModpack(modpackName) {
-    // Read the updated manifest
-    const manifestPath = path.join(modpackDirectory, modpackName, 'manifest.json');
-    fs.readFile(manifestPath, 'utf8', (err, data) => {
-        if (err) {
-            console.error(`Failed to read manifest for modpack "${modpackName}":`, err);
-            return;
-        }
-
-        // Parse the manifest data
-        const manifestData = JSON.parse(data);
-
-        // Update the associated text (like modpack name and author)
-        // You'll need to implement this function based on how you're storing and displaying your modpacks
-    });
-}
+  });
 
 function toggleMaximize() {
     let window = BrowserWindow.getFocusedWindow();
@@ -134,7 +115,7 @@ function closeModalAndResetForm() {
 
 function handleFormSubmission(event) {
     event.preventDefault();
-    ipcRenderer.on('create-modpack-reply', (event, message, modpackData, logoData) => {
+    ipcRenderer.once('create-modpack-reply', (event, message, modpackData, logoData) => {
         console.log(message);
         createModpackTile(modpackData, logoData);
       });
@@ -145,6 +126,7 @@ function handleFormSubmission(event) {
 function createModpackTile(manifestData, logoData) {
     var modpackTile = document.createElement('div');
     modpackTile.className = 'modpack-tile';
+    modpackTile.id = manifestData.modpackName;
   
     var logoElement = document.createElement('img');
     logoElement.src = URL.createObjectURL(new Blob([logoData]));
