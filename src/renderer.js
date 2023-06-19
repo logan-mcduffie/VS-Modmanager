@@ -15,12 +15,8 @@ const modpackLogoInput = document.getElementById('modpackLogo');
 const appDataPath = process.env.APPDATA || (process.platform === 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
 const modpalFolderPath = path.join(appDataPath, 'Modpal');
 const modpacksDirectoryPath = path.join(modpalFolderPath, 'modpacks');
-const watcher = chokidar.watch(modpacksDirectoryPath, {
-    ignored: /(^|[\/\\])\../, // ignore dotfiles
-    persistent: true
-  });
 
-let currentModpacks = new Set(); // Keep track of the current modpacks
+let watcher;
 
 // Event listeners for window controls
 document.getElementById('minimize').addEventListener('click', () => BrowserWindow.getFocusedWindow().minimize());
@@ -86,30 +82,40 @@ window.onload = function() {
     // Rest of your code...
 };
 
-// Add event listeners
-watcher
-  .on('addDir', path => console.log(`Directory ${path} has been added`))
-  .on('unlinkDir', path => {
-    console.log(`Directory ${path} has been removed`);
-    const modpackName = path.split(path.sep).pop();
-    removeModpack(modpackName);
-  })
-  .on('change', path => {
-    console.log(`File ${path} has been changed`);
-    if (path.endsWith('manifest.json')) {
-      const modpackName = path.split(path.sep).pop();
-      updateModpack(modpackName);
-    }
-  });
+// Function to start watching a modpack
+function watchModpack(modpackName) {
+    const modpackDirectoryPath = path.join(modpacksDirectoryPath, modpackName);
+    watcher = chokidar.watch(modpackDirectoryPath, {
+        ignored: /(^|[\/\\])\../, // ignore dotfiles
+        persistent: true
+    });
 
-function removeModpack(modpackName) {
-    // Get the modpack tile element
-    const modpackTile = document.getElementById(modpackName);
-    if (modpackTile) {
-        // Remove the modpack tile from the modpack list in "My Modpacks"
-        modpackTile.remove();
-    }
+    // Add event listeners
+    watcher
+        .on('addDir', path => console.log(`Directory ${path} has been added`))
+        .on('unlinkDir', path => {
+            console.log(`Directory ${path} has been removed`);
+            removeModpack(modpackName);
+        })
+        .on('change', path => {
+            console.log(`File ${path} has been changed`);
+            if (path.endsWith('manifest.json')) {
+                updateModpack(modpackName);
+            }
+        });
 }
+
+// Start watching all existing modpacks
+fs.readdir(modpacksDirectoryPath, (err, files) => {
+    if (err) {
+        console.error(`Failed to read modpack directory:`, err);
+        return;
+    }
+
+    for (const file of files) {
+        watchModpack(file);
+    }
+});
 
 function updateModpack(modpackName) {
     // Read the updated manifest
@@ -150,6 +156,7 @@ function handleFormSubmission(event) {
     event.preventDefault();
     ipcRenderer.once('create-modpack-reply', (event, message, modpackData, logoData) => {
         console.log(message);
+        watchModpack(modpackData.modpackName);
         createModpackTile(modpackData, logoData);
       });
     createModpackDirectory();
