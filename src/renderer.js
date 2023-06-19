@@ -2,6 +2,7 @@
 const { BrowserWindow } = require('@electron/remote');
 
 // Define UI elements
+const { ipcRenderer } = require('electron');
 const myModpacksButton = document.getElementById('my-modpacks-button');
 const browseModpacksButton = document.getElementById('browse-modpacks-button');
 const modal = document.getElementById("myModal");
@@ -10,6 +11,7 @@ const closeButton = document.getElementsByClassName("close")[0];
 const form = document.getElementById('modpackForm');
 const modpackLogoButton = document.getElementById('modpackLogoButton');
 const modpackLogoInput = document.getElementById('modpackLogo');
+const fs = require('fs');
 
 // Add 'active' class to 'myModpacksButton' by default
 myModpacksButton.classList.add('active');
@@ -57,6 +59,7 @@ function closeModalAndResetForm() {
 
 function handleFormSubmission(event) {
     event.preventDefault();
+    createModpackDirectory();
     createModpackTile();
     closeModalAndResetForm();
 }
@@ -81,4 +84,24 @@ function createModpackTile() {
     modpackTile.appendChild(authorElement);
 
     document.getElementById('my-modpacks').appendChild(modpackTile);
+}
+
+function createModpackDirectory() {
+    var modpackName = document.getElementById('modpackName').value;
+    var modpackLogo = document.getElementById('modpackLogo').files[0];
+    
+    // Read the logo file into a Buffer
+    fs.readFile(modpackLogo.path, (error, data) => {
+        if (error) {
+          console.error('An error occurred:', error);
+          return;
+        }
+
+    // Send a 'create-modpack' message to the main process with the modpack name and logo
+    ipcRenderer.send('create-modpack', modpackName, data);
+    });
+
+    ipcRenderer.on('create-modpack-reply', (event, message) => {
+        console.log(message);
+      });
 }
