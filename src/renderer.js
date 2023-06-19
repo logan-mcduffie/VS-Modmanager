@@ -16,8 +16,6 @@ const appDataPath = process.env.APPDATA || (process.platform === 'darwin' ? proc
 const modpalFolderPath = path.join(appDataPath, 'Modpal');
 const modpacksDirectoryPath = path.join(modpalFolderPath, 'modpacks');
 
-let watcher;
-
 // Event listeners for window controls
 document.getElementById('minimize').addEventListener('click', () => BrowserWindow.getFocusedWindow().minimize());
 document.getElementById('maximize').addEventListener('click', toggleMaximize);
@@ -36,6 +34,30 @@ modpackLogoInput.onchange = () => modpackLogoButton.textContent = modpackLogoInp
 form.addEventListener('submit', handleFormSubmission);
 
 window.onload = function() {
+
+    const watcher = chokidar.watch(modpacksDirectoryPath, {
+        ignored: /(^|[\/\\])\../, // ignore dotfiles
+        persistent: true
+      });
+
+      watcher
+      .on('add', dirPath => console.log(`Directory ${dirPath} has been added`))
+      .on('change', filePath => {
+        console.log(`File ${filePath} has been changed`);
+        if (filePath.endsWith('manifest.json')) {
+          const modpackName = path.basename(path.dirname(filePath));
+          updateModpack(modpackName);
+        }
+      })
+      .on('unlink', path => console.log(`File ${path} has been removed`))
+      .on('addDir', path => console.log(`Directory ${path} has been added`))
+      .on('unlinkDir', dirPath => { 
+        console.log(`Directory ${dirPath} has been removed`);
+        const modpackName = path.basename(dirPath);
+        removeModpack(modpackName);
+      });
+
+    
     // Define your pages
     const pages = ['my-modpacks', 'browse-modpacks']; // Add more page IDs as needed...
 
@@ -82,40 +104,21 @@ window.onload = function() {
     // Rest of your code...
 };
 
-// Function to start watching a modpack
-function watchModpack(modpackName) {
-    const modpackDirectoryPath = path.join(modpacksDirectoryPath, modpackName);
-    watcher = chokidar.watch(modpackDirectoryPath, {
-        ignored: /(^|[\/\\])\../, // ignore dotfiles
-        persistent: true
-    });
+function removeModpack(modpackName) {
+    console.log(`Attempting to remove modpack "${modpackName}"`);
 
-    // Add event listeners
-    watcher
-        .on('addDir', path => console.log(`Directory ${path} has been added`))
-        .on('unlinkDir', path => {
-            console.log(`Directory ${path} has been removed`);
-            removeModpack(modpackName);
-        })
-        .on('change', path => {
-            console.log(`File ${path} has been changed`);
-            if (path.endsWith('manifest.json')) {
-                updateModpack(modpackName);
-            }
-        });
+    // Get the modpack tile element
+    const modpackTile = document.getElementById(modpackName);
+    console.log(`Modpack tile:`, modpackTile);
+
+    if (modpackTile) {
+        // Remove the modpack tile from the modpack list in "My Modpacks"
+        modpackTile.remove();
+        console.log(`Removed modpack "${modpackName}"`);
+    } else {
+        console.log(`Could not find modpack "${modpackName}"`);
+    }
 }
-
-// Start watching all existing modpacks
-fs.readdir(modpacksDirectoryPath, (err, files) => {
-    if (err) {
-        console.error(`Failed to read modpack directory:`, err);
-        return;
-    }
-
-    for (const file of files) {
-        watchModpack(file);
-    }
-});
 
 function updateModpack(modpackName) {
     // Read the updated manifest
@@ -133,8 +136,8 @@ function updateModpack(modpackName) {
         const modpackTile = document.getElementById(modpackName);
         if (modpackTile) {
             // Update the associated text (like modpack name and author)
-            const nameElement = modpackTile.querySelector('h2');
-            const authorElement = modpackTile.querySelector('p');
+            const nameElement = modpackTile.querySelector('.modpack-name');
+            const authorElement = modpackTile.querySelector('.modpack-author');
             nameElement.textContent = manifestData.modpackName;
             authorElement.textContent = "Author: " + manifestData.author;
         }
@@ -156,7 +159,6 @@ function handleFormSubmission(event) {
     event.preventDefault();
     ipcRenderer.once('create-modpack-reply', (event, message, modpackData, logoData) => {
         console.log(message);
-        watchModpack(modpackData.modpackName);
         createModpackTile(modpackData, logoData);
       });
     createModpackDirectory();
