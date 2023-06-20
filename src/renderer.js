@@ -16,8 +16,6 @@ const appDataPath = process.env.APPDATA || (process.platform === 'darwin' ? proc
 const modpalFolderPath = path.join(appDataPath, 'Modpal');
 const modpacksDirectoryPath = path.join(modpalFolderPath, 'modpacks');
 
-let myModpacksPageHTML;
-
 // Event listeners for window controls
 document.getElementById('minimize').addEventListener('click', () => BrowserWindow.getFocusedWindow().minimize());
 document.getElementById('maximize').addEventListener('click', toggleMaximize);
@@ -36,8 +34,6 @@ modpackLogoInput.onchange = () => modpackLogoButton.textContent = modpackLogoInp
 form.addEventListener('submit', handleFormSubmission);
 
 window.onload = function() {
-    const myModpacksPageHTML = document.getElementById('modpack-content').innerHTML;
-
     const watcher = chokidar.watch(modpacksDirectoryPath, {
         ignored: /(^|[\/\\])\../, // ignore dotfiles
         persistent: true
