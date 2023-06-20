@@ -166,6 +166,26 @@ function handleFormSubmission(event) {
 }
 
 function createModpackTile(manifestData, logoData) {
+    // Define the path to the logo image file
+    const logoFilePath = path.join(modpacksDirectoryPath, manifestData.modpackName, 'logo.png');
+
+    // Read the logo image file
+    fs.readFile(logoFilePath, (error, logoData) => {
+        if (error) {
+            console.error('An error occurred:', error);
+            return;
+        }
+
+        // Add the click event listener to the modpack tile
+        modpackTile.addEventListener('click', () => displayModpackPage({
+            name: manifestData.modpackName,
+            author: manifestData.author,
+            version: manifestData.version,
+            creationDate: manifestData.creationDate,
+            logo: URL.createObjectURL(new Blob([logoData.buffer]))
+        }));
+    });
+
     var modpackTile = document.createElement('div');
     modpackTile.className = 'modpack-tile';
     modpackTile.id = manifestData.modpackName;
@@ -209,17 +229,18 @@ function createModpackDirectory() {
 }
 
 function createModpackPage(modpack) {
+    console.log(modpack);
     return `
         <div id="modpack-page">
-            <div id="modpack-header">
-                <img src="${modpack.logo}" alt="${modpack.name} Logo" id="modpack-logo">
+            <div id="modpack-header">s
+            <img id="modpack-logo" src="${modpack.logo}" alt="${modpack.name} Logo">
                 <div id="modpack-info">
-                    <h1 id="modpack-title">${modpack.name}</h1>
+                    <h1 id="modpack-title">${modpack.modpackName}</h1>
                     <p id="modpack-author">| ${modpack.author}</p>
                     <p id="modpack-version">${modpack.version}</p>
                     <p id="modpack-date"><i class="fa fa-clock-o"></i> ${modpack.creationDate}</p>
-                    <p id="modpack-last-played"><i class="fa fa-play"></i> ${modpack.lastPlayed}</p>
-                    <p id="modpack-game-version"><i class="fa fa-gamepad"></i> ${modpack.gameVersion}</p>
+                    <p id="modpack-last-played"><i class="fa fa-play"></i>TBD</p>
+                    <p id="modpack-game-version"><i class="fa fa-gamepad"></i>TBD</p>
                 </div>
                 <button id="play-button">Play</button>
                 <div id="kebab-menu">
