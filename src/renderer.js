@@ -232,10 +232,10 @@ function createModpackPage(modpack) {
     console.log(modpack);
     return `
         <div id="modpack-page">
-            <div id="modpack-header">s
-            <img id="modpack-logo" src="${modpack.logo}" alt="${modpack.name} Logo">
+            <div id="modpack-header">
+            <img id="modpack-logo" src="${modpack.logo}">
                 <div id="modpack-info">
-                    <h1 id="modpack-title">${modpack.modpackName}</h1>
+                    <h1 id="modpack-title">${modpack.name}</h1>
                     <p id="modpack-author">| ${modpack.author}</p>
                     <p id="modpack-version">${modpack.version}</p>
                     <p id="modpack-date"><i class="fa fa-clock-o"></i> ${modpack.creationDate}</p>
