@@ -16,6 +16,8 @@ const appDataPath = process.env.APPDATA || (process.platform === 'darwin' ? proc
 const modpalFolderPath = path.join(appDataPath, 'Modpal');
 const modpacksDirectoryPath = path.join(modpalFolderPath, 'modpacks');
 
+let myModpacksPageHTML;
+
 // Event listeners for window controls
 document.getElementById('minimize').addEventListener('click', () => BrowserWindow.getFocusedWindow().minimize());
 document.getElementById('maximize').addEventListener('click', toggleMaximize);
@@ -34,6 +36,7 @@ modpackLogoInput.onchange = () => modpackLogoButton.textContent = modpackLogoInp
 form.addEventListener('submit', handleFormSubmission);
 
 window.onload = function() {
+    const myModpacksPageHTML = document.getElementById('modpack-content').innerHTML;
 
     const watcher = chokidar.watch(modpacksDirectoryPath, {
         ignored: /(^|[\/\\])\../, // ignore dotfiles
@@ -92,6 +95,7 @@ window.onload = function() {
         // Show the current page and add 'active' class to the current button
         pageElement.style.display = 'grid';
         button.classList.add('active');
+        document.getElementById('modpack-content').innerHTML = '';
     }
 
     // Event listeners for switching views
@@ -211,32 +215,43 @@ function createModpackDirectory() {
 function createModpackPage(modpack) {
     return `
         <div id="modpack-page">
-            <h1>${modpack.modpackName}</h1>
-            <p>Author: ${modpack.author}</p>
-            <p>Version: ${modpack.version}</p>
-            <p>Description: ${modpack.description}</p>
-            <p>Creation Date: ${modpack.creationDate}</p>
-            <h2>Mod List:</h2>
-            <ul>
-                ${modpack.modList.map(mod => `<li>${mod}</li>`).join('')}
-            </ul>
-            <button id="back-button">&lt; Back</button>
+            <div id="modpack-header">
+                <img src="${modpack.logo}" alt="${modpack.name} Logo" id="modpack-logo">
+                <div id="modpack-info">
+                    <h1 id="modpack-title">${modpack.name}</h1>
+                    <p id="modpack-author">| ${modpack.author}</p>
+                    <p id="modpack-version">${modpack.version}</p>
+                    <p id="modpack-date"><i class="fa fa-clock-o"></i> ${modpack.creationDate}</p>
+                    <p id="modpack-last-played"><i class="fa fa-play"></i> ${modpack.lastPlayed}</p>
+                    <p id="modpack-game-version"><i class="fa fa-gamepad"></i> ${modpack.gameVersion}</p>
+                </div>
+                <button id="play-button">Play</button>
+                <div id="kebab-menu">
+                    <button>Change Version</button>
+                    <button>Open Folder</button>
+                    <button>Duplicate Modpack</button>
+                    <button>Delete Modpack</button>
+                    <button>Export Modpack</button>
+                </div>
+            </div>
+            <div id="modpack-content">
+                <button id="overview-button">Overview</button>
+                <button id="mods-button">Mods</button>
+                <div id="overview-content"></div>
+                <div id="mods-content"></div>
+            </div>
         </div>
-    `
+    `;
 }
 
 function displayModpackPage(modpack) {
     const modpackPageHTML = createModpackPage(modpack);
-    document.getElementById('modpack-content').innerHTML = modpackPageHTML;
-    setTimeout(() => {
-        // Add an event listener to the "Back" button
-        document.getElementById('back-button').addEventListener('click', displayMyModpacksPage);
-    }, 0);
-}
-
-function displayMyModpacksPage() {
-    document.getElementById('modpack-content').innerHTML = myModpacksPageHTML;
-}
+    document.getElementById('my-modpacks').style.display = 'none'; // Hide "My Modpacks" page
+    const modpackContent = document.getElementById('modpack-content');
+    modpackContent.innerHTML = modpackPageHTML;
+    modpackContent.style.display = 'grid'; // Show modpack page
+    document.getElementById('my-modpacks-button').classList.remove('active');
+  }
 
 ipcRenderer.on('load-modpacks', (event, modpackData, logoData) => {
     createModpackTile(modpackData, logoData);
