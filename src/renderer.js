@@ -167,6 +167,7 @@ function handleFormSubmission(event) {
 
 function createModpackTile(manifestData, logoData) {
     // Define the path to the logo image file
+    console.log(manifestData)
     const logoFilePath = path.join(modpacksDirectoryPath, manifestData.modpackName, 'logo.png');
 
     // Read the logo image file
@@ -182,7 +183,7 @@ function createModpackTile(manifestData, logoData) {
             author: manifestData.author,
             version: manifestData.version,
             creationDate: manifestData.creationDate,
-            logo: URL.createObjectURL(new Blob([logoData.buffer]))
+            logo: URL.createObjectURL(new Blob([logoData]))
         }));
     });
 
@@ -229,7 +230,8 @@ function createModpackDirectory() {
 }
 
 function createModpackPage(modpack) {
-    console.log(modpack);
+    // console.log(modpack);
+    // console.log(modpack.logo)
     return `
         <div id="modpack-page">
             <div id="modpack-header">
@@ -261,8 +263,9 @@ function createModpackPage(modpack) {
     `;
 }
 
-function displayModpackPage(modpack) {
-    const modpackPageHTML = createModpackPage(modpack);
+function displayModpackPage(manifestData) {
+    console.log(manifestData)
+    const modpackPageHTML = createModpackPage(manifestData);
     document.getElementById('my-modpacks').style.display = 'none'; // Hide "My Modpacks" page
     const modpackContent = document.getElementById('modpack-content');
     modpackContent.innerHTML = modpackPageHTML;
