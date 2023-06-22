@@ -5,10 +5,10 @@ const fs = require('fs');
 const path = require('path');
 const chokidar = require('chokidar');
 
-const { toggleMaximize, closeModalAndResetForm, handleFormSubmission } = require('./utils.js');
-const { createModpackTile, createModpackDirectory, createModpackPage, displayModpackPage, removeModpack, updateModpack } = require('./modpack.js');
-const { startWatcher } = require('./watcher.js');
-const { goToPage } = require('./page.js');
+const { toggleMaximize, closeModalAndResetForm, handleFormSubmission } = require('c:/Users/logan/OneDrive/Desktop/VS-Modmanager/src/utils');
+const { createModpackTile, createModpackDirectory, createModpackPage, displayModpackPage, removeModpack, updateModpack } = require('c:/Users/logan/OneDrive/Desktop/VS-Modmanager/src/modpack');
+const { startWatcher } = require('c:/Users/logan/OneDrive/Desktop/VS-Modmanager/src/watcher');
+const { goToPage } = require('c:/Users/logan/OneDrive/Desktop/VS-Modmanager/src/page');
 
 // Define UI elements
 const modal = document.getElementById("myModal");
