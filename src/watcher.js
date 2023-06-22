@@ -3,7 +3,7 @@ const path = require('path');
 const chokidar = require('chokidar');
 
 // Function to start the watcher
-function startWatcher(modpacksDirectoryPath, removeModpack, updateModpack) {
+function startWatcher(modpacksDirectoryPath) {
   // Watch the modpacks directory for changes
   const watcher = chokidar.watch(modpacksDirectoryPath, {
         ignored: /(^|[\/\\])\../, // ignore dotfiles
