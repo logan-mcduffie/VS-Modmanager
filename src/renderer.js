@@ -5,6 +5,11 @@ const fs = require('fs');
 const path = require('path');
 const chokidar = require('chokidar');
 
+const { toggleMaximize, closeModalAndResetForm, handleFormSubmission } = require('./utils');
+const { createModpackTile, createModpackDirectory, createModpackPage, displayModpackPage, removeModpack, updateModpack } = require('./modpack');
+const { startWatcher } = require('./watcher');
+const { goToPage } = require('./page');
+
 // Define UI elements
 const modal = document.getElementById("myModal");
 const createModpackButton = document.getElementById("create-modpack-button");
@@ -142,27 +147,6 @@ function updateModpack(modpackName) {
             authorElement.textContent = "Author: " + manifestData.author;
         }
     });
-}
-
-function toggleMaximize() {
-    let window = BrowserWindow.getFocusedWindow();
-    window.isMaximized() ? window.unmaximize() : window.maximize();
-}
-
-function closeModalAndResetForm() {
-    modal.style.display = "none";
-    form.reset();
-    modpackLogoButton.textContent = 'Choose File';
-}
-
-function handleFormSubmission(event) {
-    event.preventDefault();
-    ipcRenderer.once('create-modpack-reply', (event, message, modpackData, logoData) => {
-        console.log(message);
-        createModpackTile(modpackData, logoData);
-      });
-    createModpackDirectory();
-    closeModalAndResetForm();
 }
 
 function createModpackTile(manifestData, logoData) {
