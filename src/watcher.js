@@ -24,34 +24,34 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.startWatcher = void 0;
-var path = __importStar(require("path"));
-var chokidar = __importStar(require("chokidar"));
-var modpack_1 = require("./modpack");
-var appDataPath = process.env.APPDATA || (process.platform === 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
-var modpalFolderPath = path.join(appDataPath, 'Modpal');
-var modpacksDirectoryPath = path.join(modpalFolderPath, 'modpacks');
+const path = __importStar(require("path"));
+const chokidar = __importStar(require("chokidar"));
+const modpack_1 = require("./modpack");
+const appDataPath = process.env.APPDATA || (process.platform === 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
+const modpalFolderPath = path.join(appDataPath, 'Modpal');
+const modpacksDirectoryPath = path.join(modpalFolderPath, 'modpacks');
 // Function to start the watcher
 function startWatcher() {
     // Watch the modpacks directory for changes
-    var watcher = chokidar.watch(modpacksDirectoryPath, {
+    const watcher = chokidar.watch(modpacksDirectoryPath, {
         ignored: /(^|[\/\\])\../,
         persistent: true
     });
     watcher
-        .on('add', function (dirPath) { return console.log("Directory ".concat(dirPath, " has been added")); })
-        .on('change', function (filePath) {
-        console.log("File ".concat(filePath, " has been changed"));
+        .on('add', (dirPath) => console.log(`Directory ${dirPath} has been added`))
+        .on('change', (filePath) => {
+        console.log(`File ${filePath} has been changed`);
         if (filePath.endsWith('manifest.json')) {
-            var modpackName = path.basename(path.dirname(filePath));
+            const modpackName = path.basename(path.dirname(filePath));
             console.log("THIS THIS THIS " + modpackName);
             (0, modpack_1.updateModpack)(modpackName);
         }
     })
-        .on('unlink', function (path) { return console.log("File ".concat(path, " has been removed")); })
-        .on('addDir', function (path) { return console.log("Directory ".concat(path, " has been added")); })
-        .on('unlinkDir', function (dirPath) {
-        console.log("Directory ".concat(dirPath, " has been removed"));
-        var modpackName = path.basename(dirPath);
+        .on('unlink', (path) => console.log(`File ${path} has been removed`))
+        .on('addDir', (path) => console.log(`Directory ${path} has been added`))
+        .on('unlinkDir', (dirPath) => {
+        console.log(`Directory ${dirPath} has been removed`);
+        const modpackName = path.basename(dirPath);
         (0, modpack_1.removeModpack)(modpackName);
     });
 }

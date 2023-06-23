@@ -1,8 +1,9 @@
 {
+  "type": "commonjs",
   "name": "vs-modloader",
   "version": "1.0.0",
   "description": "A mod manager for Vintage Story that enables users to easily create and share modpacks, and manage mod installation for the game.",
-  "main": "main.ts",
+  "main": "main.js",
   "scripts": {
     "build": "tsc",
     "start": "pnpm run build && electron ."
