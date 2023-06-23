@@ -1,4 +1,4 @@
-function goToPage(pageName, pageElements, buttons) {
+export function goToPage(pageName: string, pageElements: { [ key: string]: HTMLElement }, buttons: { [ key: string ]: HTMLElement  }): void {
     const pageElement = pageElements[pageName];
     const button = buttons[pageName];
     if (!pageElement || !button) {
@@ -15,10 +15,8 @@ function goToPage(pageName, pageElements, buttons) {
     // Show the current page and add 'active' class to the current button
     pageElement.style.display = 'grid';
     button.classList.add('active');
-    document.getElementById('modpack-content').innerHTML = '';
+    const modpackContent = document.getElementById('modpack-content');
+    if (modpackContent) {
+        modpackContent.innerHTML = '';
+    }
 }
-
-// Export functions
-module.exports = {
-    goToPage
-  };

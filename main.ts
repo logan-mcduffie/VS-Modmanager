@@ -9,7 +9,7 @@ const appDataPath = process.env.APPDATA || (process.platform === 'darwin' ? proc
 const modpalFolderPath = path.join(appDataPath, 'Modpal');
 const modpacksDirectoryPath = path.join(modpalFolderPath, 'modpacks');
 
-const createWindow = () => {
+const createWindow = async () => {
   win = new BrowserWindow({
     backgroundColor: '#2e2c29',
     width: 1120,
@@ -23,9 +23,11 @@ const createWindow = () => {
     }
   });
 
-  fs.mkdir(modpalFolderPath, { recursive: true }, (err) => {
-    if (err) throw err;
-  });
+  try {
+    await fs.mkdir(modpalFolderPath, { recursive: true }, () => {}); // Use fs.promises.mkdir with await
+  } catch (err) {
+    console.error(err);
+  }
 
   win.loadFile('index.html')
   enable(win.webContents);
@@ -101,7 +103,9 @@ function loadModpacks() {
             return;
           }
           
-          win.webContents.send('load-modpacks', manifestData, logoData);
+          if (win !== null) {
+            win.webContents.send('load-modpacks', manifestData, logoData);
+        }
         });
       });
     });

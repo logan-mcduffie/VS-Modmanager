@@ -1,4 +1,6 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.goToPage = void 0;
 function goToPage(pageName, pageElements, buttons) {
     var pageElement = pageElements[pageName];
     var button = buttons[pageName];
@@ -15,9 +17,9 @@ function goToPage(pageName, pageElements, buttons) {
     // Show the current page and add 'active' class to the current button
     pageElement.style.display = 'grid';
     button.classList.add('active');
-    document.getElementById('modpack-content').innerHTML = '';
+    var modpackContent = document.getElementById('modpack-content');
+    if (modpackContent) {
+        modpackContent.innerHTML = '';
+    }
 }
-// Export functions
-module.exports = {
-    goToPage: goToPage
-};
+exports.goToPage = goToPage;

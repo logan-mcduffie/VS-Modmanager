@@ -41,7 +41,7 @@ modpackLogoInput.onchange = function () { return modpackLogoButton.textContent =
 // Event listener for form submission
 form.addEventListener('submit', handleFormSubmission);
 window.onload = function () {
-    startWatcher(modpacksDirectoryPath);
+    startWatcher();
     // Store your page elements in an object
     for (var _i = 0, pages_1 = pages; _i < pages_1.length; _i++) {
         var page = pages_1[_i];

@@ -1,11 +1,21 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+
+interface Modpack {
+    name: string;
+    author: string;
+    version: string;
+    creationDate: string;
+    modList?: string[]; // optional if not always present
+    description?: string; // optional if not always present
+    logo: string;
+  }
 
 // Function to create modpack tile
-function createModpackTile(manifestData, logoData) {
+export function createModpackTile(modpackData: Modpack, logoData: Buffer): void {
     // Define the path to the logo image file
-    console.log(manifestData)
-    const logoFilePath = path.join(modpacksDirectoryPath, manifestData.modpackName, 'logo.png');
+    console.log(modpackData)
+    const logoFilePath = path.join(modpacksDirectoryPath, modpackData.name, 'logo.png');
 
     // Read the logo image file
     fs.readFile(logoFilePath, (error, logoData) => {
@@ -16,37 +26,46 @@ function createModpackTile(manifestData, logoData) {
 
         // Add the click event listener to the modpack tile
         modpackTile.addEventListener('click', () => displayModpackPage({
-            name: manifestData.modpackName,
-            author: manifestData.author,
-            version: manifestData.version,
-            creationDate: manifestData.creationDate,
+            name: modpackData.name,
+            author: modpackData.author,
+            version: modpackData.version,
+            creationDate: modpackData.creationDate,
             logo: URL.createObjectURL(new Blob([logoData]))
         }));
     });
 
     var modpackTile = document.createElement('div');
     modpackTile.className = 'modpack-tile';
-    modpackTile.id = manifestData.modpackName;
+    modpackTile.id = modpackData.name;
   
     var logoElement = document.createElement('img');
     logoElement.src = URL.createObjectURL(new Blob([logoData]));
     modpackTile.appendChild(logoElement);
   
     var nameElement = document.createElement('h2');
-    nameElement.textContent = manifestData.modpackName;
+    nameElement.textContent = modpackData.name;
     modpackTile.appendChild(nameElement);
   
     var authorElement = document.createElement('p');
-    authorElement.textContent = "Author: " + manifestData.author;
+    authorElement.textContent = "Author: " + modpackData.author;
     modpackTile.appendChild(authorElement);
   
-    document.getElementById('my-modpacks').appendChild(modpackTile);
+    let myModpacksElement = document.getElementById('my-modpacks');
+        if (myModpacksElement) {
+            myModpacksElement.appendChild(modpackTile);
+        } else {
+            console.error("Element with id 'my-modpacks' not found");
+    }
 }
 
 // Function to create modpack directory
-function createModpackDirectory() {
-    var modpackName = document.getElementById('modpackName').value;
-    var modpackLogo = document.getElementById('modpackLogo').files[0];
+export function createModpackDirectory(): void {
+    let modpackNameElement = document.getElementById('modpackName') as HTMLInputElement;
+    let modpackLogoElement = document.getElementById('modpackLogo') as HTMLInputElement;
+
+    if (modpackNameElement && modpackLogoElement && modpackLogoElement.files) {
+        var modpackName = modpackNameElement.value;
+        var modpackLogo = modpackLogoElement.files[0];
     
     // Read the logo file into a Buffer
     fs.readFile(modpackLogo.path, (error, data) => {
@@ -62,10 +81,14 @@ function createModpackDirectory() {
     ipcRenderer.on('create-modpack-reply', (event, message) => {
         console.log(message);
       });
+
+    } else {
+        console.error("Element with id 'modpackName' or 'modpackLogo' not found");
+    }
 }
 
 // Function to create modpack page
-function createModpackPage(modpack) {
+export function createModpackPage(modpack: Modpack): string {
     // console.log(modpack);
     // console.log(modpack.logo)
     return `
@@ -100,18 +123,30 @@ function createModpackPage(modpack) {
 }
 
 // Function to display modpack page
-function displayModpackPage(manifestData) {
-    console.log(manifestData)
-    const modpackPageHTML = createModpackPage(manifestData);
-    document.getElementById('my-modpacks').style.display = 'none'; // Hide "My Modpacks" page
+export function displayModpackPage(data: Modpack): void {
+    console.log(data)
+    const modpackPageHTML = createModpackPage(data);
+    const myModpacksElement = document.getElementById('my-modpacks');
     const modpackContent = document.getElementById('modpack-content');
-    modpackContent.innerHTML = modpackPageHTML;
-    modpackContent.style.display = 'grid'; // Show modpack page
-    document.getElementById('my-modpacks-button').classList.remove('active');
+    const myModpacksButtonElement = document.getElementById('my-modpacks-button');
+
+    if (myModpacksElement) {
+        myModpacksElement.style.display = 'none'; // Hide "My Modpacks" page
+    }
+
+    if (modpackContent) {
+        modpackContent.innerHTML = modpackPageHTML;
+        modpackContent.style.display = 'grid'; // Show modpack page
+    }
+
+    if (myModpacksButtonElement) {
+        myModpacksButtonElement.classList.remove('active');
+    }
 }
 
+
 // Function to remove modpack
-function removeModpack(modpackName) {
+export function removeModpack(modpackName: string): void {
     console.log(`Attempting to remove modpack "${modpackName}"`);
 
     // Get the modpack tile element
@@ -128,7 +163,7 @@ function removeModpack(modpackName) {
 }
 
 // Function to update modpack
-function updateModpack(modpackName) {
+export function updateModpack(modpackName: string): void {
     console.log("IM WHAT YOU'RE LOOKING FOR" + " " + modpackName)
     // Read the updated manifest
     const manifestPath = path.join(modpacksDirectoryPath, modpackName, 'manifest.json');
@@ -147,18 +182,12 @@ function updateModpack(modpackName) {
             // Update the associated text (like modpack name and author)
             const nameElement = modpackTile.querySelector('.modpack-name');
             const authorElement = modpackTile.querySelector('.modpack-author');
-            nameElement.textContent = manifestData.modpackName;
-            authorElement.textContent = "Author: " + manifestData.author;
+            if (nameElement) {
+                nameElement.textContent = manifestData.modpackName;
+            }
+            if (authorElement) {
+                authorElement.textContent = "Author: " + manifestData.author;
+            }
         }
     });
 }
-
-// Export functions
-module.exports = {
-  createModpackTile,
-  createModpackDirectory,
-  createModpackPage,
-  displayModpackPage,
-  removeModpack,
-  updateModpack
-};
