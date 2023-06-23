@@ -1,4 +1,4 @@
-function goToPage(pageName) {
+function goToPage(pageName, pageElements, buttons) {
     const pageElement = pageElements[pageName];
     const button = buttons[pageName];
     if (!pageElement || !button) {
@@ -7,7 +7,7 @@ function goToPage(pageName) {
     }
 
     // Hide all pages and remove 'active' class from all buttons
-    for (const page of pages) {
+    for (const page of Object.keys(pageElements)) {
         pageElements[page].style.display = 'none';
         buttons[page].classList.remove('active');
     }

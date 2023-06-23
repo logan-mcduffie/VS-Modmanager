@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const chokidar = require('chokidar');
+const { updateModpack, removeModpack } = require('./modpack');
 
 // Function to start the watcher
 function startWatcher(modpacksDirectoryPath) {
