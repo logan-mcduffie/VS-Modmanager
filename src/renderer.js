@@ -62,9 +62,13 @@ window.onload = function() {
     buttons['browse-modpacks'].addEventListener('click', () => goToPage('browse-modpacks'));
 
     // Initialize the default page
-    goToPage('my-modpacks');
+    goToPage('my-modpacks', pageElements, buttons);
 
-    // Rest of your code...
+    ipcRenderer.on('load-modpacks', (event, modpackData, logoData) => {
+        createModpackTile(modpackData, logoData);
+      });
+    
+    ipcRenderer.send('load-modpacks');
 };
 
 removeModpack(modpackName)
@@ -78,9 +82,3 @@ createModpackDirectory()
 createModpackPage(modpack)
 
 displayModpackPage(manifestData)
-
-ipcRenderer.on('load-modpacks', (event, modpackData, logoData) => {
-    createModpackTile(modpackData, logoData);
-  });
-
-ipcRenderer.send('load-modpacks');
