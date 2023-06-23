@@ -11,6 +11,8 @@ const { startWatcher } = require('c:/Users/logan/OneDrive/Desktop/VS-Modmanager/
 const { goToPage } = require('c:/Users/logan/OneDrive/Desktop/VS-Modmanager/src/page');
 
 // Define UI elements
+const pages = ['my-modpacks', 'browse-modpacks'];
+const pageElements = {};
 const modal = document.getElementById("myModal");
 const createModpackButton = document.getElementById("create-modpack-button");
 const closeButton = document.getElementsByClassName("close")[0];
@@ -20,6 +22,11 @@ const modpackLogoInput = document.getElementById('modpackLogo');
 const appDataPath = process.env.APPDATA || (process.platform === 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
 const modpalFolderPath = path.join(appDataPath, 'Modpal');
 const modpacksDirectoryPath = path.join(modpalFolderPath, 'modpacks');
+const buttons = {
+    'my-modpacks': document.getElementById('my-modpacks-button'),
+    'browse-modpacks': document.getElementById('browse-modpacks-button'),
+    // Add more buttons as needed...
+};
 
 // Event listeners for window controls
 document.getElementById('minimize').addEventListener('click', () => BrowserWindow.getFocusedWindow().minimize());
@@ -40,22 +47,10 @@ form.addEventListener('submit', handleFormSubmission);
 
 window.onload = function() {
     startWatcher(modpacksDirectoryPath);
-
-    // Define your pages
-    const pages = ['my-modpacks', 'browse-modpacks']; // Add more page IDs as needed...
-
     // Store your page elements in an object
-    const pageElements = {};
     for (const page of pages) {
         pageElements[page] = document.getElementById(page);
     }
-
-    // Store your buttons in an object
-    const buttons = {
-        'my-modpacks': document.getElementById('my-modpacks-button'),
-        'browse-modpacks': document.getElementById('browse-modpacks-button'),
-        // Add more buttons as needed...
-    };
 
     // Event listeners for switching views
     buttons['my-modpacks'].addEventListener('click', () => goToPage('my-modpacks'));
