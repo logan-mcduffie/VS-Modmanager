@@ -1,12 +1,13 @@
-const { app, BrowserWindow } = require('electron')
-const { ipcMain } = require('electron');
-const fs = require('fs');
-const path = require('path');
+import { app, BrowserWindow, ipcMain } from 'electron';
+import { initialize, enable } from '@electron/remote/main';
+import fs from 'fs';
+import path from 'path';
+
+let win: BrowserWindow | null;
+
 const appDataPath = process.env.APPDATA || (process.platform === 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
 const modpalFolderPath = path.join(appDataPath, 'Modpal');
 const modpacksDirectoryPath = path.join(modpalFolderPath, 'modpacks');
-require('@electron/remote/main').initialize()
-let win;
 
 const createWindow = () => {
   win = new BrowserWindow({
@@ -17,25 +18,21 @@ const createWindow = () => {
     minHeight: 780,
     frame: false,
     webPreferences: {
-      enableRemoteModule: true,
       nodeIntegration: true,
       contextIsolation: false,
     }
-  })
+  });
 
   fs.mkdir(modpalFolderPath, { recursive: true }, (err) => {
     if (err) throw err;
   });
 
   win.loadFile('index.html')
-
-  // win.webContents.openDevTools()
-
-  require('@electron/remote/main').enable(win.webContents)
+  enable(win.webContents);
 }
 
 // Listen for the 'create-modpack' message
-ipcMain.on('create-modpack', (event, modpackName, logoData) => {
+ipcMain.on('create-modpack', (event, modpackName: string, logoData: Buffer) => {
   const modpackDirectoryPath = path.join(modpalFolderPath, 'modpacks', modpackName);
   const logoFilePath = path.join(modpackDirectoryPath, 'logo.png');
 

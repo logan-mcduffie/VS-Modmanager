@@ -4,12 +4,14 @@
   "description": "A mod manager for Vintage Story that enables users to easily create and share modpacks, and manage mod installation for the game.",
   "main": "main.ts",
   "scripts": {
-    "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "start": "pnpm run build && electron ."
   },
   "author": "Logan McDuffie",
   "license": "ISC",
   "devDependencies": {
+    "@types/electron": "^1.6.10",
+    "@types/node": "^20.3.1",
     "electron": "^25.1.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.3"
