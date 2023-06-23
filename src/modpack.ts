@@ -39,8 +39,6 @@ function createModpackTile(manifestData, logoData) {
     var authorElement = document.createElement('p');
     authorElement.textContent = "Author: " + manifestData.author;
     modpackTile.appendChild(authorElement);
-
-    modpackTile.addEventListener('click', () => displayModpackPage(manifestData));
   
     document.getElementById('my-modpacks').appendChild(modpackTile);
 }
@@ -131,6 +129,7 @@ function removeModpack(modpackName) {
 
 // Function to update modpack
 function updateModpack(modpackName) {
+    console.log("IM WHAT YOU'RE LOOKING FOR" + " " + modpackName)
     // Read the updated manifest
     const manifestPath = path.join(modpacksDirectoryPath, modpackName, 'manifest.json');
     fs.readFile(manifestPath, 'utf8', (err, data) => {

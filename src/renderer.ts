@@ -53,8 +53,10 @@ window.onload = function() {
     }
 
     // Event listeners for switching views
-    buttons['my-modpacks'].addEventListener('click', () => goToPage('my-modpacks'));
-    buttons['browse-modpacks'].addEventListener('click', () => goToPage('browse-modpacks'));
+    buttons['my-modpacks'].addEventListener('click', () => goToPage('my-modpacks', pageElements, buttons));
+    buttons['browse-modpacks'].addEventListener('click', () => goToPage('browse-modpacks', pageElements, buttons));
+
+    
 
     // Initialize the default page
     goToPage('my-modpacks', pageElements, buttons);

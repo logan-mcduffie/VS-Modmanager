@@ -17,6 +17,7 @@ function startWatcher(modpacksDirectoryPath) {
         console.log(`File ${filePath} has been changed`);
         if (filePath.endsWith('manifest.json')) {
           const modpackName = path.basename(path.dirname(filePath));
+          console.log("THIS THIS THIS " + modpackName)
           updateModpack(modpackName);
         }
       })
