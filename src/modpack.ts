@@ -1,5 +1,9 @@
+import { ipcRenderer } from 'electron';
 import fs from 'fs';
 import path from 'path';
+const appDataPath = process.env.APPDATA || (process.platform === 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
+const modpalFolderPath = path.join(appDataPath, 'Modpal');
+const modpacksDirectoryPath = path.join(modpalFolderPath, 'modpacks');
 
 interface Modpack {
     name: string;

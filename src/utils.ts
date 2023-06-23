@@ -1,8 +1,10 @@
 import { BrowserWindow } from '@electron/remote';
+import { createModpackDirectory, createModpackTile } from './modpack';
+import { ipcRenderer } from 'electron';
 
 
 // Function to toggle maximize
-function toggleMaximize() {
+export function toggleMaximize() {
   let window = BrowserWindow.getFocusedWindow();
   if (window) {
       window.isMaximized() ? window.unmaximize() : window.maximize();
@@ -11,7 +13,7 @@ function toggleMaximize() {
 
 
 // Function to close modal and reset form
-function closeModalAndResetForm() {
+export function closeModalAndResetForm() {
   const modal = document.getElementById('modal-id'); // replace 'modal-id' with the actual id
   const form = document.getElementById('form-id') as HTMLFormElement; // replace 'form-id' with the actual id
   const modpackLogoButton = document.getElementById('modpackLogoButton-id'); // replace 'modpackLogoButton-id' with the actual id
@@ -24,7 +26,7 @@ function closeModalAndResetForm() {
 
 
 // Function to handle form submission
-function handleFormSubmission(event: any) {
+export function handleFormSubmission(event: any) {
     event.preventDefault();
     ipcRenderer.once('create-modpack-reply', (event, message, modpackData, logoData) => {
         console.log(message);
@@ -33,10 +35,3 @@ function handleFormSubmission(event: any) {
     createModpackDirectory();
     closeModalAndResetForm();
 }
-
-// Export functions
-module.exports = {
-  toggleMaximize,
-  closeModalAndResetForm,
-  handleFormSubmission
-};

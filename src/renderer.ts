@@ -44,7 +44,7 @@ modpackLogoInput.onchange = () => modpackLogoButton.textContent = modpackLogoInp
 // Event listener for form submission
 form.addEventListener('submit', handleFormSubmission);
 
-window.onload = function() {
+window.onload = function(): void {
     startWatcher();
     // Store your page elements in an object
     for (const page of pages) {
@@ -60,9 +60,10 @@ window.onload = function() {
     // Initialize the default page
     goToPage('my-modpacks', pageElements, buttons);
 
-    ipcRenderer.on('load-modpacks', (event, modpackData, logoData) => {
+    ipcRenderer.on('load-modpacks', (event: Electron.IpcRendererEvent, modpackData: any, logoData: any) => {
         createModpackTile(modpackData, logoData);
-      });
+    });
+    
     
     ipcRenderer.send('load-modpacks');
 };
